@@ -1,0 +1,9 @@
+ion-content {
+    ion-item:first-child {
+        --ion-background-color:#999999;
+    }
+
+    ion-item:not(:first-child) {
+        font-size: 12px
+    }
+}

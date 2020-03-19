@@ -1,5 +1,8 @@
 {
   "name": "face_recognition_apps",
-  "integrations": {},
+  "integrations": {
+    "cordova": {},
+    "capacitor": {}
+  },
   "type": "angular"
 }

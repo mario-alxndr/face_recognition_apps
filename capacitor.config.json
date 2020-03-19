@@ -1,0 +1,20 @@
+{
+  "appId": "io.ionic.starter",
+  "appName": "face_recognition_apps",
+  "bundledWebRuntime": false,
+  "windowsAndroidStudioPath": "C:\\Program Files\\android-studio\\bin\\studio64.exe",
+  "npmClient": "npm",
+  "webDir": "www",
+  "cordova": {
+    "preferences": {
+      "ScrollEnabled": "false",
+      "android-minSdkVersion": "19",
+      "BackupWebStorage": "none",
+      "SplashMaintainAspectRatio": "true",
+      "FadeSplashScreenDuration": "300",
+      "SplashShowOnlyFirstTime": "false",
+      "SplashScreen": "screen",
+      "SplashScreenDelay": "3000"
+    }
+  }
+}

@@ -1,119 +1,101 @@
-import { Component, OnInit } from '@angular/core';
-import { Storage } from '@ionic/storage';
-import { Router } from '@angular/router';
-import { AlertController } from '@ionic/angular';
-import { environment } from '../../environments/environment';
-import axios from 'axios';
-import { async } from '@angular/core/testing';
+import { Component, OnInit } from "@angular/core";
+import { Storage } from "@ionic/storage";
+import { Router } from "@angular/router";
+import { AlertController, LoadingController } from "@ionic/angular";
+import { environment } from "../../environments/environment";
+import axios from "axios";
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.page.html',
-  styleUrls: ['./login.page.scss'],
+selector: "app-login",
+templateUrl: "./login.page.html",
+styleUrls: ["./login.page.scss"]
 })
 export class LoginPage implements OnInit {
+  stringLoading = "Please wait. We are checking your login informations."
 
   constructor(
-    // private router: Router,
+    private router: Router,
     public alertController: AlertController,
-    // private storage: Storage,
-  ) { }
+    private loadingCtrl: LoadingController,
+    private storage: Storage
+) {}
 
-  ngOnInit() {
-
-  }
+  ngOnInit() {}
 
   async onLogin(form) {
-    let stringNotification = '';
+    let stringNotification = "";
     let loginSuccess = false;
     let counter = 0;
     let loginPage = this;
 
-    
-
-    if(!form.value.user_name || !form.value.password) {
+    if (!form.value.user_name || !form.value.password) {
       stringNotification += " Please enter your ";
-      if(!form.value.user_name) {
+      if (!form.value.user_name) {
         stringNotification += "username";
         counter++;
-      } 
-      if(!form.value.password) {
-        if(counter>0) {
+      }
+      if (!form.value.password) {
+        if (counter > 0) {
           stringNotification += " & ";
         }
         stringNotification += "password";
         counter++;
       }
       loginPage.presentAlert(stringNotification);
-    }
+    } 
+    
     else {
-      // let data =  {
-      //   'user_name': form.value.user_name,
-      //   'password': form.value.password
-      // };
-      
-      // const loginStatus = this.hitLogin(data);
-      // console.log(loginStatus);
-      var bodyFormData = new FormData();
-      
-      bodyFormData.append('user_name',  form.value.user_name);
-      bodyFormData.append('password',  form.value.password);
+      // loginPage.presentLoading(this.stringLoading);
+      let data = {
+        user_name: form.value.user_name,
+        password: form.value.password
+      };
 
       axios({
-        method: 'post',
+        method: "post",
         url: environment.endPointConstant.loginEndPoint,
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
+          "Content-Type": "application/json",
           "Allow-Control-Allow-Origin": "127.0.0.1:5000",
-          "Access-Control-Allow-Methods":
-            "GET, POST, PATCH, PUT, DELETE, OPTIONS",
+          // "Access-Control-Allow-Methods":
+          // "GET, POST, PATCH, PUT, DELETE, OPTIONS",
           "Access-Control-Allow-Headers": "Origin, Content-Type, X-Auth-Token"
         },
-        withCredentials: true,
-        data: {
-          // bodyFormData
-          "user_name": form.value.user_name,
-          "password": form.value.password
+        data
+      })
+      .then(res => {
+        console.log(res);
+        // loginPage.loadingCtrl.dismiss();
+        if(res.data === "Username and Password Combination not Found!") {
+          loginPage.presentAlert(res.data);
+        }
+        else {
+          // form.reset();
+          this.storage.set(environment.tokenKeyStorage.userid, res.data).then(() => {
+            loginPage.router.navigateByUrl('/mainmenu');
+          })
         }
       })
-      // console.log(environment.endPointConstant.loginEndPoint + '?user_name=' + form.value.user_name + '&password=' + form.value.password);
-      // axios({
-      //   method: 'post',
-      //   url: environment.endPointConstant.loginEndPoint + '?user_name=' + form.value.user_name + '&password=' + form.value.password,
-      //   headers: {
-      //     "Content-Type": "application/x-www-form-urlencoded",
-      //     "Allow-Control-Allow-Origin": "127.0.0.1:5000",
-      //     "Access-Control-Allow-Methods":
-      //       "GET, POST, PATCH, PUT, DELETE, OPTIONS",
-      //     "Access-Control-Allow-Headers": "Origin, Content-Type, X-Auth-Token"
-      //   },
-      //   withCredentials: true,
-      // })
-      // .then(res => {
-      //   console.log(res);
-      // })
     }
   }
 
-  // hitLogin = async(data) => {
-  //   const res = await axios.post(environment.endPointConstant.loginEndPoint, JSON.stringify(data), {
-  //     headers: {
-  //         "Content-Type": "application/json",
-  //         "Allow-Control-Allow-Origin": "*",
-  //         "Access-Control-Allow-Methods":
-  //           "GET, POST, PATCH, PUT, DELETE, OPTIONS",
-  //         "Access-Control-Allow-Headers": "Origin, Content-Type, X-Auth-Token"
-  //       },
+  // presentLoading(stringLoading) {
+  //   console.log("mulai present")
+  //   this.loadingCtrl.create({
+  //     keyboardClose: true,
+  //     message: stringLoading
   //   })
-
-  //   return res.data;
+  //   .then(loadingEl => {
+  //     loadingEl.present();
+  //   })
+  //   console.log("selesai present")
   // }
 
   async presentAlert(stringNotification) {
     const alertFailed = await this.alertController.create({
-      header: 'Error',
+      header: "",
       message: stringNotification,
-      buttons: ['OK']
+      buttons: ["OK"]
     });
 
     await alertFailed.present();
